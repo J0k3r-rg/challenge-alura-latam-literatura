@@ -13,6 +13,7 @@ import com.j0k3r.challengealuralatamliteratura.services.LibroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,6 +55,9 @@ public class Main {
                 case "4":
                     buscarLibroPorAutor();
                     break;
+                case "5":
+                    buscarLibroPorAutorAnio();
+                    break;
                 case "0":
                     System.out.println("""
                             *******************************************************
@@ -73,6 +77,7 @@ public class Main {
                 2- Listar todos los libros de la base de datos
                 3- Buscar libro por lenguaje
                 4- Buscar libro por autor
+                5- Buscar libro por año de autor
                 
                 0- Salir de la aplicacion
                 Ingrese opcion de la operacion que desea realizar""");
@@ -142,6 +147,15 @@ public class Main {
             System.out.println("No se encontraron libros con ese autor");
             return;
         }
+        libros.forEach(System.out::println);
+    }
+
+    private void buscarLibroPorAutorAnio(){
+        System.out.println("Ingrese año para buscar libro");
+        int anio = scanner.nextInt();scanner.nextLine();
+        List<Autor> autores = autorService.obtenerTodosLosAutores().stream().filter( autor -> autor.getDeath_year() == null || autor.getDeath_year() > anio ).toList();
+        List<Libro> libros = new ArrayList<>();
+        autores.forEach(autor -> libros.addAll(libroService.buscarPorAutor(autor.getName())));
         libros.forEach(System.out::println);
     }
 }
