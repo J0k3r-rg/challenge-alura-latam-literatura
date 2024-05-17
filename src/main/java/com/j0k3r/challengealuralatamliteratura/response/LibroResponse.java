@@ -17,4 +17,8 @@ public record LibroResponse(
 
         List<Autor> authors
 ) {
+    @Override
+    public String toString(){
+        return "Titulo: %s - Lenguajes: %s - Autores: %s".formatted(this.title,this.languages, this.authors.stream().map(autor -> autor.toString().replace(",", " ")).toList());
+    }
 }

@@ -8,7 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "langs")
-@ToString
 public class Lang {
 
     @Id
@@ -20,5 +19,10 @@ public class Lang {
 
     public Lang(String lang) {
         this.lang = lang;
+    }
+
+    @Override
+    public String toString(){
+        return this.lang;
     }
 }

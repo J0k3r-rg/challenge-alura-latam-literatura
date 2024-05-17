@@ -17,6 +17,7 @@ import java.util.List;
 public class Libro {
 
     @Id
+    @ToString.Exclude
     private Long id;
 
     private String title;

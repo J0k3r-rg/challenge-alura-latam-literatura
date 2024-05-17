@@ -44,20 +44,25 @@ public class Main {
             opcion = menuPrincipal();
             switch (opcion){
                 case "1":
-                    buscarLibroEnGutendex();
+                    uscarLibroPorTituloEnGutendex();
                     break;
                 case "2":
-                    listarTodosLosLibros();
+                    listarTodosLosAutores();
                     break;
                 case "3":
-                    buscarLibroPorLenguaje();
+                    listarTodosLosLibros();
                     break;
                 case "4":
-                    buscarLibroPorAutor();
+                    buscarLibroPorLenguaje();
                     break;
                 case "5":
+                    buscarLibroPorAutor();
+                    break;
+                case "6":
                     buscarLibroPorAutorAnio();
                     break;
+                case "7":
+                    mostrarTop10();
                 case "0":
                     System.out.println("""
                             *******************************************************
@@ -73,21 +78,23 @@ public class Main {
     private String menuPrincipal(){
         System.out.println("""
                 ------------------------------------------------------
-                1- Buscar libro en Gudendex
-                2- Listar todos los libros de la base de datos
-                3- Buscar libro por lenguaje
-                4- Buscar libro por autor
-                5- Buscar libro por año de autor
+                1- Buscar libro por titulo en Gutendex
+                2. Listar todos los autores de la base de datos
+                3- Listar todos los libros de la base de datos
+                4- Buscar libro por lenguaje
+                5- Buscar libro por autor
+                6- Buscar libro por año de autor (vivo)
+                7- Top 10 mas descargados de la base de datos
                 
                 0- Salir de la aplicacion
                 Ingrese opcion de la operacion que desea realizar""");
         return scanner.nextLine();
     }
 
-    private void buscarLibroEnGutendex() {
+    private void uscarLibroPorTituloEnGutendex() {
         System.out.println("Ingrese el titulo del libro que desea buscar");
         String title = scanner.nextLine();
-        List<LibroResponse> result = mapperData.getData(gutendex.search(title),ResponseResult.class).results().stream().limit(10).toList();
+        List<LibroResponse> result = mapperData.getData(gutendex.searchForTitle(title),ResponseResult.class).results().stream().limit(10).toList();
         if(result.isEmpty()) {
             System.out.println("No se encontraron libros con ese titulo");
             return;
@@ -102,12 +109,24 @@ public class Main {
         System.out.println("Quiere guardar algun libro de la lista?");
         System.out.println("SI - Guardar");
         System.out.println("Cualquier opcion = No guardar");
+        System.out.println("TODOS - guardar todos los libros mostrados");
         res = scanner.nextLine();
         if(res.equalsIgnoreCase("si")){
             System.out.println("ingrese numero del libro que desea guardar");
             String opcion = scanner.nextLine();
             libroService.guardarLibro(result.get(Integer.parseInt(opcion)-1));
-            System.out.println("Libro guardado exitosamente");
+        }
+        if(res.equalsIgnoreCase("todos")){
+            result.forEach(resul -> libroService.guardarLibro(resul));
+        }
+    }
+
+    private void listarTodosLosAutores(){
+        List<Autor> autores = autorService.obtenerTodosLosAutores();
+        if(autores.isEmpty()){
+            System.out.println("No se encontraron autores en la base de datos");
+        } else{
+            autores.forEach(System.out::println);
         }
     }
 
@@ -157,5 +176,9 @@ public class Main {
         List<Libro> libros = new ArrayList<>();
         autores.forEach(autor -> libros.addAll(libroService.buscarPorAutor(autor.getName())));
         libros.forEach(System.out::println);
+    }
+
+    private void mostrarTop10(){
+
     }
 }

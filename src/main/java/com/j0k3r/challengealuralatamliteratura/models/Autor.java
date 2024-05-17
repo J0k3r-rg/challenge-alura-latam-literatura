@@ -11,10 +11,10 @@ import lombok.*;
 @Table(name = "autores")
 @EqualsAndHashCode(of = "name")
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
 public class Autor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ToString.Exclude
     private Long id;
 
     private String name;
@@ -22,4 +22,9 @@ public class Autor {
     private Long birth_year;
 
     private Long death_year;
+
+    @Override
+    public String toString(){
+        return this.name.replace("," , " ");
+    }
 }

@@ -9,6 +9,7 @@ import com.j0k3r.challengealuralatamliteratura.repositories.LibroRepository;
 import com.j0k3r.challengealuralatamliteratura.response.LibroResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ public class LibroService {
             });
             Libro libroFinal = new Libro(libro.id(), libro.title(),langList, libro.download_count(), autorList);
             libroRepository.save(libroFinal);
+            System.out.printf("%s guardado exitosamente%n", libroFinal.getTitle());
+        } else {
+            System.out.println("El libro ya se encuantra registrado en la base de datos");
         }
     }
 

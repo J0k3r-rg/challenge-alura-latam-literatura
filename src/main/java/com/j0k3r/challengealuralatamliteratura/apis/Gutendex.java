@@ -17,7 +17,7 @@ public class Gutendex {
     @Autowired
     private Environment environment;
 
-    public String search(String title){
+    public String searchForTitle(String title){
         return getResponse("?search="+title.replace(" ","+")).body();
     }
 
