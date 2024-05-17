@@ -1,16 +1,18 @@
 package com.j0k3r.challengealuralatamliteratura.services;
 
 import com.j0k3r.challengealuralatamliteratura.models.Autor;
+import com.j0k3r.challengealuralatamliteratura.models.Lang;
 import com.j0k3r.challengealuralatamliteratura.models.Libro;
 import com.j0k3r.challengealuralatamliteratura.repositories.AutorRepository;
+import com.j0k3r.challengealuralatamliteratura.repositories.LangRepository;
 import com.j0k3r.challengealuralatamliteratura.repositories.LibroRepository;
+import com.j0k3r.challengealuralatamliteratura.response.LibroResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class LibroService {
@@ -21,16 +23,24 @@ public class LibroService {
     @Autowired
     private AutorRepository autorRepository;
 
+    @Autowired
+    private LangRepository langRepository;
+
     @Transactional
-    public void guardarLibro(Libro libro){
-        if(!libroRepository.existsById(libro.getId())){
+    public void guardarLibro(LibroResponse libro){
+        if(!libroRepository.existsById(libro.id())){
             List<Autor> autorList = new ArrayList<>();
-            libro.getAuthors().forEach(autorElement ->{
+            List<Lang> langList = new ArrayList<>();
+            libro.authors().forEach(autorElement ->{
                 Autor autor = autorRepository.findByName(autorElement.getName()).orElse(null);
                 autorList.add(autor == null ? autorRepository.save(autorElement):autor);
             });
-            libro.setAuthors(autorList);
-            libroRepository.save(libro);
+            libro.languages().forEach(langElement -> {
+                Lang lang = langRepository.findByLang(langElement).orElse(null);
+                langList.add(lang== null ? langRepository.save(new Lang(langElement)) : lang);
+            });
+            Libro libroFinal = new Libro(libro.id(), libro.title(),langList, libro.download_count(), autorList);
+            libroRepository.save(libroFinal);
         }
     }
 
@@ -40,6 +50,10 @@ public class LibroService {
 
     public List<Libro> buscarLibroPorTitulo(String title){
         return libroRepository.findByTitle(title);
+    }
+
+    public List<Libro> buscarPorLenguaje(String lang){
+        return libroRepository.findByLanguagesLang(lang);
     }
 
 }

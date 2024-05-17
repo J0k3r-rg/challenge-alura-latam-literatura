@@ -1,7 +1,7 @@
 package com.j0k3r.challengealuralatamliteratura.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.j0k3r.challengealuralatamliteratura.enums.Lang;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +21,9 @@ public class Libro {
 
     private String title;
 
-    @Enumerated(EnumType.STRING)
+    @Setter
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "libro_lang",joinColumns = @JoinColumn(name = "id_libro"),inverseJoinColumns = @JoinColumn(name = "id_lang"))
     private List<Lang> languages;
 
     private Long download_count;
