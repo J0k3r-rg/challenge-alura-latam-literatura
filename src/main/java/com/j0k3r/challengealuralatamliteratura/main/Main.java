@@ -2,10 +2,12 @@ package com.j0k3r.challengealuralatamliteratura.main;
 
 import com.j0k3r.challengealuralatamliteratura.apis.Gutendex;
 import com.j0k3r.challengealuralatamliteratura.mappers.MapperData;
+import com.j0k3r.challengealuralatamliteratura.models.Autor;
 import com.j0k3r.challengealuralatamliteratura.models.Lang;
 import com.j0k3r.challengealuralatamliteratura.models.Libro;
 import com.j0k3r.challengealuralatamliteratura.response.LibroResponse;
 import com.j0k3r.challengealuralatamliteratura.response.ResponseResult;
+import com.j0k3r.challengealuralatamliteratura.services.AutorService;
 import com.j0k3r.challengealuralatamliteratura.services.LangService;
 import com.j0k3r.challengealuralatamliteratura.services.LibroService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class Main {
     @Autowired
     private LangService langService;
 
+    @Autowired
+    private AutorService autorService;
+
     public void init(){
         String opcion = "-1";
         while (!opcion.equals("0")){
@@ -45,6 +50,9 @@ public class Main {
                     break;
                 case "3":
                     buscarLibroPorLenguaje();
+                    break;
+                case "4":
+                    buscarLibroPorAutor();
                     break;
                 case "0":
                     System.out.println("""
@@ -64,6 +72,7 @@ public class Main {
                 1- Buscar libro en Gudendex
                 2- Listar todos los libros de la base de datos
                 3- Buscar libro por lenguaje
+                4- Buscar libro por autor
                 
                 0- Salir de la aplicacion
                 Ingrese opcion de la operacion que desea realizar""");
@@ -117,6 +126,20 @@ public class Main {
         List<Libro> libros = libroService.buscarPorLenguaje(langs.get(res-1).getLang());
         if (libros.isEmpty()){
             System.out.println("No se encontraron libros con ese lenguaje");
+            return;
+        }
+        libros.forEach(System.out::println);
+    }
+
+    private void buscarLibroPorAutor(){
+        List<Autor> autores = autorService.obtenerTodosLosAutores();
+        AtomicInteger i = new AtomicInteger(1);
+        System.out.println("Seleccione el autor para buscar en la base de datos:");
+        autores.forEach(autor -> System.out.println(i.getAndIncrement() + " - " + autor.getName()));
+        int res = scanner.nextInt(); scanner.nextLine();
+        List<Libro> libros = libroService.buscarPorAutor(autores.get(res-1).getName());
+        if (libros.isEmpty()){
+            System.out.println("No se encontraron libros con ese autor");
             return;
         }
         libros.forEach(System.out::println);

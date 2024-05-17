@@ -56,4 +56,8 @@ public class LibroService {
         return libroRepository.findByLanguagesLang(lang);
     }
 
+    public List<Libro> buscarPorAutor(String autor){
+        return libroRepository.findByAuthorsName(autor);
+    }
+
 }
