@@ -18,7 +18,7 @@ public class Gutendex {
     private Environment environment;
 
     public String search(String title){
-        return getResponse("?search="+title).body();
+        return getResponse("?search="+title.replace(" ","+")).body();
     }
 
     private HttpResponse<String> getResponse(String url){

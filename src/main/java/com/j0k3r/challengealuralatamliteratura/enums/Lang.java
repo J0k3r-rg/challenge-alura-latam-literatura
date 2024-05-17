@@ -8,5 +8,6 @@ public enum Lang {
     es,
     fr,
     bg,
+    de,
     fi;
 }
