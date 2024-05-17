@@ -9,18 +9,19 @@ Desarrollar un Catálogo de Libros que ofrezca interacción textual (vía consol
 
 Los pasos para completar este desafío se detallarán a continuación y estarán disponibles en la sección adyacente:
 
-Configuración del Ambiente Java;
-
-Creación del Proyecto;
-
-Consumo de la API;
-
-Análisis de la Respuesta JSON;
-
-Inserción y consulta en la base de datos;
-
-Exibición de resultados a los usuarios;
+    Configuración del Ambiente Java;
+    
+    Creación del Proyecto;
+    
+    Consumo de la API;
+    
+    Análisis de la Respuesta JSON;
+    
+    Inserción y consulta en la base de datos;
+    
+    Exibición de resultados a los usuarios;
 
 ### Tablero de trello:
-    https://trello.com/b/xLcGq20r
+[Ir al trello del challenge](https://trello.com/b/WDyMPDMb/literalura-challenge-java)
+    
 
