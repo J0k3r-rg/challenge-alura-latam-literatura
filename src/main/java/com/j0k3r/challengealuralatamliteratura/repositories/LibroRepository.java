@@ -16,4 +16,9 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
 
     List<Libro> findByAuthorsName(String name);
 
+    @Query(
+            "SELECT l FROM Libro l ORDER BY l.download_count DESC LIMIT 10"
+    )
+    List<Libro> findTop10OrderByDownload_countDesc();
+
 }

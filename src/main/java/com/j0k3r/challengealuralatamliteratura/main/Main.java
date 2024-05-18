@@ -63,6 +63,10 @@ public class Main {
                     break;
                 case "7":
                     mostrarTop10();
+                    break;
+                case "8":
+                    buscarAutorPorNombre();
+                    break;
                 case "0":
                     System.out.println("""
                             *******************************************************
@@ -85,6 +89,7 @@ public class Main {
                 5- Buscar libro por autor
                 6- Buscar libro por año de autor (vivo)
                 7- Top 10 mas descargados de la base de datos
+                8- Buscar Autor por nombre en la base de datos
                 
                 0- Salir de la aplicacion
                 Ingrese opcion de la operacion que desea realizar""");
@@ -179,6 +184,16 @@ public class Main {
     }
 
     private void mostrarTop10(){
+        libroService.mostrarTop10Descargados().forEach(System.out::println);
+    }
 
+    private void buscarAutorPorNombre(){
+        System.out.println("Ingrese nombre del autor que desea buscar en la base de datos");
+        List<Autor> autores = autorService.listarAutoresPorNombre(scanner.nextLine());
+        if(autores.isEmpty()){
+            System.out.println("****** No se encontraron autores con ese nombre en la base de datos ******");
+            return;
+        }
+        autores.forEach(System.out::println);
     }
 }

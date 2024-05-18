@@ -15,4 +15,8 @@ public class AutorService {
     public List<Autor> obtenerTodosLosAutores(){
         return autorRepository.findAll();
     }
+
+    public List<Autor> listarAutoresPorNombre(String nombre){
+        return autorRepository.findByNameContaining(nombre);
+    }
 }
