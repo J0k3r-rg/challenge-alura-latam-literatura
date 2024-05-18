@@ -44,7 +44,7 @@ public class Main {
             opcion = menuPrincipal();
             switch (opcion){
                 case "1":
-                    uscarLibroPorTituloEnGutendex();
+                    buscarLibroPorTituloEnGutendex();
                     break;
                 case "2":
                     listarTodosLosAutores();
@@ -85,9 +85,9 @@ public class Main {
                 1- Buscar libro por titulo en Gutendex
                 2. Listar todos los autores de la base de datos
                 3- Listar todos los libros de la base de datos
-                4- Buscar libro por lenguaje
-                5- Buscar libro por autor
-                6- Buscar libro por año de autor (vivo)
+                4- Buscar libro por lenguaje en la base de datos
+                5- Buscar libro por autor en la base de datos
+                6- Buscar libro por año de autor en la base de datos
                 7- Top 10 mas descargados de la base de datos
                 8- Buscar Autor por nombre en la base de datos
                 
@@ -96,30 +96,20 @@ public class Main {
         return scanner.nextLine();
     }
 
-    private void uscarLibroPorTituloEnGutendex() {
+    private void buscarLibroPorTituloEnGutendex() {
         System.out.println("Ingrese el titulo del libro que desea buscar");
         String title = scanner.nextLine();
         List<LibroResponse> result = mapperData.getData(gutendex.searchForTitle(title),ResponseResult.class).results().stream().limit(10).toList();
-        if(result.isEmpty()) {
-            System.out.println("No se encontraron libros con ese titulo");
-            return;
-        }
-        System.out.println("Resultados de la busqueda");
-        int i=1;
-        for(LibroResponse libro : result){
-            System.out.printf("%d - %s \n",i,libro.toString());
-            i++;
-        }
-        String res;
+        mostrarListaConIdice(result);
         System.out.println("Quiere guardar algun libro de la lista?");
         System.out.println("SI - Guardar");
         System.out.println("Cualquier opcion = No guardar");
         System.out.println("TODOS - guardar todos los libros mostrados");
-        res = scanner.nextLine();
+        String res = scanner.nextLine();
         if(res.equalsIgnoreCase("si")){
             System.out.println("ingrese numero del libro que desea guardar");
-            String opcion = scanner.nextLine();
-            libroService.guardarLibro(result.get(Integer.parseInt(opcion)-1));
+            int index = leerInteger();
+            libroService.guardarLibro((LibroResponse) obtenerElementoPorIndice(result,index));
         }
         if(res.equalsIgnoreCase("todos")){
             result.forEach(resul -> libroService.guardarLibro(resul));
@@ -128,36 +118,21 @@ public class Main {
 
     private void listarTodosLosAutores(){
         List<Autor> autores = autorService.obtenerTodosLosAutores();
-        if(autores.isEmpty()){
-            System.out.println("No se encontraron autores en la base de datos");
-        } else{
-            autores.forEach(System.out::println);
-        }
+        mostrarLista(autores);
     }
 
     private void listarTodosLosLibros(){
         List<Libro> libros = libroService.buscarTodosLosLibros();
-        if(libros.isEmpty()){
-            System.out.println("No se encontraron libros en la base de datos");
-        } else{
-            libros.forEach(System.out::println);
-        }
+        mostrarLista(libros);
     }
 
     private void buscarLibroPorLenguaje(){
         System.out.println("Seleccione el lenguaje para buscar en la base de datos:");
-        AtomicInteger i = new AtomicInteger(1);
         List<Lang> langs = langService.obtenerTodosLosLenguajes();
-        langs.forEach(
-                lang -> System.out.println(i.getAndIncrement() + " - "+lang.getLang())
-        );
-        int res = scanner.nextInt(); scanner.nextLine();
-        List<Libro> libros = libroService.buscarPorLenguaje(langs.get(res-1).getLang());
-        if (libros.isEmpty()){
-            System.out.println("No se encontraron libros con ese lenguaje");
-            return;
-        }
-        libros.forEach(System.out::println);
+        mostrarListaConIdice(langs);
+        int index = leerInteger();
+        List<Libro> libros = libroService.buscarPorLenguaje(((Lang)obtenerElementoPorIndice(langs,index)).getLang());
+        mostrarLista(libros);
     }
 
     private void buscarLibroPorAutor(){
@@ -165,35 +140,72 @@ public class Main {
         AtomicInteger i = new AtomicInteger(1);
         System.out.println("Seleccione el autor para buscar en la base de datos:");
         autores.forEach(autor -> System.out.println(i.getAndIncrement() + " - " + autor.getName()));
-        int res = scanner.nextInt(); scanner.nextLine();
-        List<Libro> libros = libroService.buscarPorAutor(autores.get(res-1).getName());
-        if (libros.isEmpty()){
-            System.out.println("No se encontraron libros con ese autor");
-            return;
-        }
-        libros.forEach(System.out::println);
+        int index = leerInteger();
+        List<Libro> libros = libroService.buscarPorAutor(((Autor) obtenerElementoPorIndice(autores,index)).getName());
+        mostrarLista(libros);
     }
 
     private void buscarLibroPorAutorAnio(){
         System.out.println("Ingrese año para buscar libro");
-        int anio = scanner.nextInt();scanner.nextLine();
+        int anio = leerInteger();
         List<Autor> autores = autorService.obtenerTodosLosAutores().stream().filter( autor -> autor.getDeath_year() == null || autor.getDeath_year() > anio ).toList();
         List<Libro> libros = new ArrayList<>();
         autores.forEach(autor -> libros.addAll(libroService.buscarPorAutor(autor.getName())));
-        libros.forEach(System.out::println);
+        mostrarLista(libros);
     }
 
     private void mostrarTop10(){
-        libroService.mostrarTop10Descargados().forEach(System.out::println);
+        List<Libro> libros = libroService.mostrarTop10Descargados();
+        mostrarLista(libros);
     }
 
     private void buscarAutorPorNombre(){
         System.out.println("Ingrese nombre del autor que desea buscar en la base de datos");
         List<Autor> autores = autorService.listarAutoresPorNombre(scanner.nextLine());
-        if(autores.isEmpty()){
-            System.out.println("****** No se encontraron autores con ese nombre en la base de datos ******");
+        mostrarLista(autores);
+    }
+
+    private void mostrarLista(List<?> list){
+        if (list.isEmpty()){
+            System.out.println("****** no se encontraron resultados en la base de datos ******");
             return;
         }
-        autores.forEach(System.out::println);
+        list.forEach(System.out::println);
+    }
+
+    private void mostrarListaConIdice(List<?> list){
+        if (list.isEmpty()) {
+            System.out.println("****** No hay resultados para mostrar ******");
+            return;
+        }
+        AtomicInteger i = new AtomicInteger(1);
+        list.forEach(
+                item -> {
+                    if (item instanceof Lang) System.out.println(i.getAndIncrement() + " - "+((Lang)item).getLang());
+                    if (item instanceof LibroResponse) System.out.println(i.getAndIncrement() + " - "+((LibroResponse)item).title());
+                }
+        );
+    }
+
+    private Integer leerInteger(){
+        while(true){
+            try {
+                String value = scanner.nextLine();
+                return Integer.valueOf(value);
+            } catch (NumberFormatException e){
+                System.out.println("Dato Ingresado invalido, solo se permiten numeros. Intete de nuevo:");
+            }
+        }
+    }
+
+    public Object obtenerElementoPorIndice(List<?> list, int index){
+        while (true){
+            try{
+                return list.get(index-1);
+            }catch (IndexOutOfBoundsException e){
+                System.out.println("Indice fuera de rango, intente de nuevo:");
+                index = leerInteger();
+            };
+        }
     }
 }
